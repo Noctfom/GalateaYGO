@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "models": [
+    {
+      "id": "preview-general",
+      "slug": "example-general",
+      "name": "Galatea · 通用策略",
+      "author": { "name": "GalateaYGO Preview", "github": null },
+      "summary": {
+        "zh": "探索通用决斗模型的发布页面，从训练血统到部署资源，一处了解",
+        "en": "Explore a general-purpose model page, from training lineage to deployment resources"
+      },
+      "description": {
+        "zh": "这是用于展示网站布局的示例条目，不对应已发布的模型，也不提供下载。实际发布时，作者可以介绍训练目标、适用场景、推荐使用方式以及仍需验证的部分。\n\n模型版本分别展示 PPO 与 BC 轮次，部署格式与附带内容分开说明。性能结果应提供独立评测记录，而不是仅凭训练轮数推断。",
+        "en": "This example demonstrates the website layout. It is not a published model and has no download. A real listing can describe training goals, intended uses, recommended settings, and limitations.\n\nVersions show PPO and BC counts separately. Deployment format and optional contents are listed explicitly. Performance claims need evaluation evidence, rather than training iteration counts alone."
+      },
+      "tags": ["PPO", "V4", "GKG"],
+      "category": "general",
+      "accent": "violet",
+      "featured": true,
+      "updatedAt": "2026-11-06",
+      "license": "未声明 / Not specified",
+      "example": true,
+      "releases": [
+        {
+          "id": "preview-general-r2",
+          "label": "迭代 200 · 示例版本",
+          "createdAt": "2026-11-06",
+          "modelProtocol": 4,
+          "packageFormat": 5,
+          "ppoIteration": 200,
+          "bcIteration": 0,
+          "format": "GKG",
+          "sizeBytes": null,
+          "sha256": null,
+          "url": null,
+          "attachments": ["decks", "documents"],
+          "notes": { "zh": "展示 GKG5 附件和独立的发布版本信息，不代表真实训练成果", "en": "Demonstrates GKG5 contents and separate release identity; not a real training result" }
+        },
+        {
+          "id": "preview-general-r1",
+          "label": "迭代 100 · 示例版本",
+          "createdAt": "2026-11-01",
+          "modelProtocol": 4,
+          "packageFormat": 4,
+          "ppoIteration": 100,
+          "bcIteration": 0,
+          "format": "GKG",
+          "sizeBytes": null,
+          "sha256": null,
+          "url": null,
+          "attachments": [],
+          "notes": { "zh": "用于体验历史版本切换的示例记录", "en": "An example record for exploring previous releases" }
+        }
+      ]
+    },
+    {
+      "id": "preview-branded",
+      "slug": "example-branded",
+      "name": "Galatea · 烙印研究",
+      "author": { "name": "GalateaYGO Preview", "github": null },
+      "summary": { "zh": "以卡组专项研究为例，展示构筑、模仿训练与回放的发布方式", "en": "A deck-specialist example for sharing deck lists, imitation lineage, and replays" },
+      "description": {
+        "zh": "此条目演示卡组专项模型的展示方式，不代表已有烙印模型或已测得的对局强度。作者可以说明使用的构筑、对手类型、镜像或常规卡池评测条件。\n\n回放和预设可以随部署包提供。预设的携带不意味着自动应用；回放中是否含预测记录，应以实际文件为准。",
+        "en": "This listing demonstrates a deck-specialist model page. It does not represent an available Branded model or measured playing strength. Authors can document deck lists, opponents, and mirror or regular-pool evaluation conditions.\n\nReplays and presets can accompany a package. Including a preset does not apply it automatically, and prediction data must be present in the actual replay."
+      },
+      "tags": ["BC + PPO", "V4", "WindBot"],
+      "category": "specialist",
+      "accent": "amber",
+      "featured": true,
+      "updatedAt": "2026-11-05",
+      "license": "未声明 / Not specified",
+      "example": true,
+      "releases": [
+        {
+          "id": "preview-branded-r1",
+          "label": "PPO 200 / BC 5 · 示例版本",
+          "createdAt": "2026-11-05",
+          "modelProtocol": 4,
+          "packageFormat": 5,
+          "ppoIteration": 200,
+          "bcIteration": 5,
+          "format": "GKG",
+          "sizeBytes": null,
+          "sha256": null,
+          "url": null,
+          "attachments": ["decks", "replays", "documents", "presets"],
+          "notes": { "zh": "展示卡组、回放、说明和预设四类可选附件", "en": "Demonstrates the four optional content types: decks, replays, documents, and presets" }
+        }
+      ]
+    },
+    {
+      "id": "preview-light",
+      "slug": "example-light",
+      "name": "Galatea · 轻量探索",
+      "author": { "name": "GalateaYGO Preview", "github": null },
+      "summary": { "zh": "为本地部署准备清晰的使用说明，展示轻量模型的分享入口", "en": "A lightweight model example focused on clear instructions for local deployment" },
+      "description": {
+        "zh": "这是轻量部署场景的示例页面，不对应可下载模型。真实发布应由作者提供测量设备、运行后端和内存需求，网站不会从名称推断性能。\n\n部署包可以同时记录模型协议和资源要求。最终能否运行仍由 Core 或 Link 的导入检查确定。",
+        "en": "This page illustrates a lightweight deployment scenario and has no downloadable model. Real releases should report tested hardware, runtime, and memory requirements; the website does not infer performance from a name.\n\nA deployment package records protocol and resource requirements. Core or Link performs the final compatibility checks during import."
+      },
+      "tags": ["ONNX", "V4", "GKG"],
+      "category": "lightweight",
+      "accent": "teal",
+      "featured": false,
+      "updatedAt": "2026-11-03",
+      "license": "未声明 / Not specified",
+      "example": true,
+      "releases": [
+        {
+          "id": "preview-light-r1",
+          "label": "迭代 120 · 示例版本",
+          "createdAt": "2026-11-03",
+          "modelProtocol": 4,
+          "packageFormat": 5,
+          "ppoIteration": 120,
+          "bcIteration": 0,
+          "format": "GKG",
+          "sizeBytes": null,
+          "sha256": null,
+          "url": null,
+          "attachments": ["documents"],
+          "notes": { "zh": "展示部署说明附件，不包含性能或兼容性承诺", "en": "Demonstrates deployment documentation, without performance or compatibility claims" }
+        }
+      ]
+    }
+  ]
+}

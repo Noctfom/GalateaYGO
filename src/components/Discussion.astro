@@ -1,0 +1,83 @@
+---
+import Icon from './Icon.astro';
+import { community } from '../lib/community';
+import { text as t, type Lang } from '../lib/catalog';
+
+interface Props { lang: Lang; modelId: string; example?: boolean }
+const { lang, modelId, example = false } = Astro.props;
+const enabled = community.discussionEnabled && !example;
+const term = `galateaygo:model:${modelId}`;
+---
+
+<section class="model-discussion" aria-labelledby="model-discussion-title"
+  data-discussion={enabled ? 'ready' : 'unavailable'} data-repo={enabled ? community.repository : undefined}
+  data-repo-id={enabled ? community.giscus?.repoId : undefined}
+  data-category={enabled ? community.giscus?.category : undefined}
+  data-category-id={enabled ? community.giscus?.categoryId : undefined}
+  data-term={enabled ? term : undefined} data-language={lang === 'zh' ? 'zh-CN' : 'en'}>
+  <h2 id="model-discussion-title"><Icon name="message" size={21}/>{t(lang, '模型讨论', 'Model discussion')}</h2>
+  {example ? <p>{t(lang, '示例模型不开放评论，正式模型发布后可在这里交流使用体验', 'Comments are unavailable for preview models. Published models can host discussions here.')}</p>
+    : enabled ? <>
+      <p>{t(lang, '中英文页面与各发布版本共用此模型的讨论区。加载后将连接 giscus 与 GitHub，发表评论需要 GitHub 账号', 'Both languages and all releases share this model’s discussion. Loading it connects to giscus and GitHub; posting requires a GitHub account.')}</p>
+      <div class="discussion-actions">
+        <button class="button button-outline" type="button" data-load-discussion>{t(lang, '加载模型讨论', 'Load model discussion')}</button>
+        <a class="text-link" href={community.discussionsUrl!} target="_blank" rel="noopener noreferrer">{t(lang, '在 GitHub 交流', 'Discuss on GitHub')}<Icon name="external" size={14}/></a>
+      </div>
+      <p class="discussion-status" data-discussion-status role="status" aria-live="polite"></p>
+      <div class="giscus" data-discussion-container></div>
+    </> : <>
+      <p>{community.discussionsUrl
+        ? t(lang, '网页评论尚未开放，可以先到社区讨论区交流', 'Embedded comments are not enabled yet. Join the community discussion on GitHub.')
+        : t(lang, '社区讨论区尚未开放，开放后会在这里显示交流入口', 'The community discussion space is not open yet. Its entry will appear here when available.')}</p>
+      {community.discussionsUrl && <a class="text-link" href={community.discussionsUrl} target="_blank" rel="noopener noreferrer">{t(lang, '前往社区讨论', 'Open community discussions')}<Icon name="external" size={14}/></a>}
+    </>}
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-discussion="ready"]').forEach(section => {
+    const button = section.querySelector<HTMLButtonElement>('[data-load-discussion]')!;
+    const status = section.querySelector<HTMLElement>('[data-discussion-status]')!;
+    const container = section.querySelector<HTMLElement>('[data-discussion-container]')!;
+    const zh = section.dataset.language === 'zh-CN';
+    let started = false;
+    button.addEventListener('click', () => {
+      if (started) return;
+      started = true;
+      button.disabled = true;
+      status.textContent = zh ? '正在连接讨论区…' : 'Connecting to the discussion…';
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      // 模型标识作为讨论键，语言切换和发布版本切换不会拆分讨论
+      const settings: Record<string, string> = {
+        repo: section.dataset.repo!, 'repo-id': section.dataset.repoId!,
+        category: section.dataset.category!, 'category-id': section.dataset.categoryId!,
+        mapping: 'specific', term: section.dataset.term!, strict: '1',
+        'reactions-enabled': '1', 'emit-metadata': '0', 'input-position': 'top',
+        theme: 'light', lang: section.dataset.language!, loading: 'lazy',
+      };
+      Object.entries(settings).forEach(([key, value]) => script.setAttribute(`data-${key}`, value));
+      script.addEventListener('load', () => {
+        button.hidden = true;
+        status.textContent = zh ? '若评论未显示，可通过上方链接在 GitHub 查看讨论' : 'If comments do not appear, use the GitHub link above to view discussions.';
+      });
+      script.addEventListener('error', () => {
+        started = false;
+        button.disabled = false;
+        script.remove();
+        status.textContent = zh ? '讨论区加载失败，可以重试或前往 GitHub' : 'The discussion could not load. Try again or open GitHub.';
+      });
+      container.append(script);
+    });
+  });
+</script>
+
+<style>
+  .model-discussion{margin-top:36px;padding-top:27px;border-top:1px solid var(--line)}
+  h2{display:flex;align-items:center;gap:10px;font-size:20px;letter-spacing:-.02em}
+  p{font-size:13px;color:var(--muted);line-height:1.9;margin-top:12px}
+  .discussion-actions{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:18px}
+  .discussion-actions .button{font-size:12px}.text-link{font-size:12px;display:inline-flex;gap:7px;align-items:center}
+  .discussion-status{font-size:12px;min-height:1.5em}.giscus{margin-top:12px}
+</style>

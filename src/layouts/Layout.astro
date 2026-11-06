@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { demoMode, text as t, path, type Lang } from '../lib/catalog';
+const { title = 'GalateaYGO', description, lang = 'zh', active = 'home' } = Astro.props as { title?: string, description?: string, lang: Lang, active?: string };
+const route = /^\/(zh|en)\//.test(Astro.url.pathname) ? Astro.url.pathname.replace(/^\/(zh|en)\/?/, '') : '';
+const nav = [{id:'home',slug:'',zh:'首页',en:'Home'},{id:'models',slug:'models',zh:'模型广场',en:'Models'},{id:'docs',slug:'docs',zh:'文档',en:'Docs'},{id:'community',slug:'community',zh:'社区',en:'Community'}];
+---
+<!doctype html>
+<html lang={lang === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content={description || t(lang,'探索、分享和使用游戏王 AI 模型。GalateaYGO 开放模型社区','Discover, share and use Yu-Gi-Oh! AI models. The GalateaYGO community')}/>
+    <meta name="theme-color" content="#f8f7f4"/>
+    {demoMode && <meta name="robots" content="noindex, nofollow"/>}
+    <title>{title === 'GalateaYGO' ? title : `${title} — GalateaYGO`}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t(lang,'跳到内容','Skip to content')}</a>
+    <header class="site-header"><div class="container header-inner">
+      <a href={path(lang)} class="brand" aria-label="GalateaYGO"><span class="brand-mark"><span></span></span><span>Galatea<span class="brand-ygo">YGO</span><small>OPEN MODEL COMMUNITY</small></span></a>
+      <nav class="main-nav" aria-label={t(lang,'主导航','Main navigation')}>{nav.map(item => <a href={path(lang,item.slug)} class:list={{active:active===item.id}} aria-current={active===item.id?'page':undefined}>{t(lang,item.zh,item.en)}</a>)}</nav>
+      <div class="header-actions"><a class="language-link" href={path(lang==='zh'?'en':'zh',route)} aria-label={t(lang,'切换为英文','Switch to Chinese')}><Icon name="globe" size={16}/>{lang==='zh'?'EN':'中文'}</a><a class="button button-small button-dark publish-nav" href={path(lang,'publish')}><span>+</span>{t(lang,'发布模型','Publish')}</a></div>
+    </div></header>
+    {demoMode && <div class="preview-strip"><div class="container"><span class="status-dot"></span>{t(lang,'开发预览','Development preview')}<span class="preview-divider">/</span>{t(lang,'目录含示例模型，用于体验页面与操作','The catalog includes example models for previewing the experience')}</div></div>}
+    <main id="main"><slot/></main>
+    <footer class="site-footer"><div class="container footer-top"><div><a href={path(lang)} class="footer-brand">GalateaYGO<span>✦</span></a><p>{t(lang,'让每一种对局思路，都有生长的空间','A place for every way of thinking about a duel')}</p></div><div class="footer-links"><a href={path(lang,'docs')}>{t(lang,'使用文档','Documentation')}</a><a href="https://github.com/Noctfom/Galatea-Core" target="_blank" rel="noopener noreferrer">Galatea Core <Icon name="external" size={12}/></a><a href={path(lang,'community')}>{t(lang,'参与社区','Join the community')}</a><a href={path(lang,'publish')}>{t(lang,'发布指南','Publishing guide')}</a></div></div><div class="container footer-bottom"><span>© 2026 GalateaYGO · {t(lang,'独立开源项目','An independent open-source project')}</span><span>{t(lang,'模型由作者托管 · 浏览与下载无需登录','Author-hosted models · Browse and download without an account')}</span></div></footer>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script>
+      const toast = document.querySelector('#toast') as HTMLElement;
+      let toastTimer: ReturnType<typeof setTimeout>;
+      window.addEventListener('galatea:toast', ((event: CustomEvent) => { toast.textContent = event.detail; toast.classList.add('visible'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.classList.remove('visible'),3000); }) as EventListener);
+      const getSaved = (): string[] => {try { const data=JSON.parse(localStorage.getItem('galatea:saved') || '[]'); return Array.isArray(data) ? data.filter(v=>typeof v==='string') : []; } catch { return []; }};
+      const refreshFavorites=()=>{const saved=getSaved();document.querySelectorAll<HTMLButtonElement>('[data-favorite]').forEach(button=>button.setAttribute('aria-pressed',String(saved.includes(button.dataset.favorite!))));};
+      document.querySelectorAll<HTMLButtonElement>('[data-favorite]').forEach(button=>button.addEventListener('click',()=>{const id=button.dataset.favorite!;const saved=getSaved();const next=saved.includes(id)?saved.filter(item=>item!==id):[...saved,id];try{localStorage.setItem('galatea:saved',JSON.stringify(next));refreshFavorites();window.dispatchEvent(new Event('galatea:saved'));}catch{window.dispatchEvent(new CustomEvent('galatea:toast',{detail:document.documentElement.lang==='zh-CN'?'当前浏览器无法保存收藏':'This browser cannot save favorites'}));}}));
+      window.addEventListener('storage',()=>{refreshFavorites();window.dispatchEvent(new Event('galatea:saved'));});refreshFavorites();
+      document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(button.dataset.copy || '');window.dispatchEvent(new CustomEvent('galatea:toast',{detail:document.documentElement.lang==='zh-CN'?'已复制到剪贴板':'Copied to clipboard'}));}catch{window.dispatchEvent(new CustomEvent('galatea:toast',{detail:document.documentElement.lang==='zh-CN'?'复制失败，请手动选择文本':'Could not copy. Please select the text manually'}));}}));
+    </script>
+  </body>
+</html>

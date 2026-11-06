@@ -1,0 +1,41 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Icon from '../../../components/Icon.astro';
+import ModelCard from '../../../components/ModelCard.astro';
+import {models,categories,text as t,path,type Lang} from '../../../lib/catalog';
+export function getStaticPaths(){return ['zh','en'].map(lang=>({params:{lang}}));}
+const lang=Astro.params.lang as Lang;
+---
+<Layout lang={lang} title={t(lang,'模型广场','Model collection')} active="models"><div class="container page-content">
+  <div class="page-heading"><div class="eyebrow">EXPLORE THE COLLECTION</div><h1>{t(lang,'每一个模型，都是一种思考方式','Every model, a different perspective.')}</h1><p>{t(lang,'发现适合你的对局伙伴，也发现训练者的不同尝试','Find your next dueling partner and discover what the community is building.')}</p></div>
+  <div class="catalog-toolbar"><label class="search-box"><Icon name="search" size={19}/><input id="model-search" type="search" autocomplete="off" placeholder={t(lang,'搜索模型、作者或标签…','Search models, authors or tags…')} aria-label={t(lang,'搜索模型','Search models')}/><kbd>/</kbd></label><label class="sort-label"><span>{t(lang,'排序','Sort')}</span><select id="model-sort"><option value="recent">{t(lang,'最近更新','Recently updated')}</option><option value="name">{t(lang,'名称 A–Z','Name A–Z')}</option></select></label></div>
+  <div class="catalog-filters"><div class="filter-tabs" role="group" aria-label={t(lang,'模型类型','Model categories')}>{categories.map(category=><button class:list={{selected:category.id==='all'}} data-filter={category.id} aria-pressed={category.id==='all'}>{category[lang]}</button>)}</div><label class="saved-filter"><input type="checkbox" id="saved-only"/><Icon name="star" size={16}/>{t(lang,'我的收藏','Saved models')}</label></div>
+  <div class="catalog-count" role="status" aria-live="polite"><span id="model-count">{models.length}</span> {t(lang,'个模型','models')}<span class="muted">{t(lang,' · 收藏仅保存在当前浏览器',' · Saved on this browser')}</span></div>
+  <div class="model-grid" id="catalog-grid">{models.map(model=><ModelCard model={model} lang={lang}/>)}</div>
+  <div class="empty-state" id="no-results" hidden={models.length>0}><Icon name="search" size={32}/><h2>{t(lang,'这里还没有匹配的模型','No matching models yet')}</h2><p>{t(lang,'换个关键词，或重置筛选条件试试','Try a different keyword or reset your filters.')}</p><button class="button button-outline" id="reset-filters">{t(lang,'重置筛选','Reset filters')}</button></div>
+  <div class="catalog-publish"><span><Icon name="spark" size={19}/>{t(lang,'你训练的模型，也可以在这里被发现','Your model could be discovered here, too.')}</span><a class="text-link" href={path(lang,'publish')}>{t(lang,'分享你的模型','Share your model')}<Icon name="arrow" size={16}/></a></div>
+</div></Layout>
+<script>
+  const search=document.querySelector<HTMLInputElement>('#model-search')!;
+  const sort=document.querySelector<HTMLSelectElement>('#model-sort')!;
+  const saved=document.querySelector<HTMLInputElement>('#saved-only')!;
+  const grid=document.querySelector('#catalog-grid')!;
+  const cards=[...document.querySelectorAll<HTMLElement>('[data-model-card]')];
+  const params=new URLSearchParams(location.search);
+  let category=params.get('category')||'all';
+  if(!document.querySelector(`[data-filter="${CSS.escape(category)}"]`)) category='all';
+  search.value=params.get('q')||'';
+  const getSaved=()=>{try{const data=JSON.parse(localStorage.getItem('galatea:saved')||'[]');return Array.isArray(data)?data:[];}catch{return [];}};
+  function update(){
+    const query=search.value.trim().toLowerCase();const favorites=getSaved();let count=0;
+    document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(button=>{const active=button.dataset.filter===category;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));});
+    cards.sort((a,b)=>sort.value==='name'?a.querySelector('h3')!.textContent!.localeCompare(b.querySelector('h3')!.textContent!):(b.dataset.updated||'').localeCompare(a.dataset.updated||''));
+    cards.forEach(card=>{const visible=(!query||card.dataset.search!.includes(query))&&(category==='all'||category===card.dataset.category)&&(!saved.checked||favorites.includes(card.dataset.id));card.hidden=!visible;grid.appendChild(card);if(visible)count++;});
+    document.querySelector('#model-count')!.textContent=String(count);(document.querySelector('#no-results') as HTMLElement).hidden=count>0;
+    const next=new URL(location.href);query?next.searchParams.set('q',search.value):next.searchParams.delete('q');category==='all'?next.searchParams.delete('category'):next.searchParams.set('category',category);history.replaceState({},'',next);
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(button=>button.addEventListener('click',()=>{category=button.dataset.filter!;update();}));
+  search.addEventListener('input',update);sort.addEventListener('change',update);saved.addEventListener('change',update);window.addEventListener('galatea:saved',update);
+  document.querySelector('#reset-filters')!.addEventListener('click',()=>{search.value='';category='all';saved.checked=false;sort.value='recent';update();});
+  document.addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement).tagName)){e.preventDefault();search.focus();}});update();
+</script>

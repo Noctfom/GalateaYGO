@@ -1,0 +1,27 @@
+name: 模型投稿 / Model submission
+description: 提交模型介绍与 GKG 发布信息 / Submit a model and its GKG release information
+title: "[Model] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请从 GalateaYGO 投稿页复制完整 JSON 并粘贴到下方，模型文件继续保存在你的发布仓库
+        提交后由维护者核对发布来源并加入目录，提交 Issue 不会立即发布模型
+
+        Copy the complete JSON from the GalateaYGO submission page and paste it below
+        Keep model files in your release repository; a maintainer reviews the submission before listing it
+  - type: textarea
+    id: submission
+    attributes:
+      label: 发布资料 JSON / Submission JSON
+      description: 粘贴完整草稿，不需要 Markdown 代码围栏 / Paste the complete draft without Markdown fences
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 补充说明 / Additional context
+      description: 可补充评测报告或说明与模型发布者的关系 / Optionally link evaluations or explain your relationship to the publisher
+    validations:
+      required: false

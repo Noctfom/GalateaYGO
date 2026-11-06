@@ -1,0 +1,12 @@
+---
+import Icon from './Icon.astro';
+import Artwork from './Artwork.astro';
+import { text as t, path, type Lang, type Model } from '../lib/catalog';
+const {model,lang} = Astro.props as {model:Model,lang:Lang};
+const release=model.releases[0];
+const releaseFormats=model.releases.flatMap(item=>[`V${item.modelProtocol}`,`GKG${item.packageFormat}`,`GKG ${item.packageFormat}`]);
+---
+<article class={`model-card accent-${model.accent}`} data-model-card data-category={model.category} data-updated={model.updatedAt} data-search={[model.name,model.author.name,model.summary.zh,model.summary.en,...model.tags,...releaseFormats].join(' ').toLowerCase()} data-id={model.id}>
+  <div class="card-visual"><a href={path(lang,`models/${model.slug}`)} class="art-link" aria-label={model.name}><Artwork variant={model.accent}/></a><div class="card-visual-top"><span class="tiny-label">{model.category === 'general' ? 'GENERALIST' : model.category === 'specialist' ? 'SPECIALIST' : 'LIGHTWEIGHT'}</span><button class="icon-button favorite" data-favorite={model.id} aria-label={t(lang,`收藏 ${model.name}`,`Save ${model.name}`)} aria-pressed="false"><Icon name="star" size={18}/></button></div><div class="card-visual-bottom"><span>MODEL PROTOCOL V{release.modelProtocol}</span><span class="card-art-index">{model.category==='general'?'01':model.category==='specialist'?'02':'03'}</span></div></div>
+  <div class="card-body"><div class="card-meta"><span>{model.author.name}</span>{model.example && <span class="badge badge-neutral">{t(lang,'示例','Example')}</span>}</div><h3><a href={path(lang,`models/${model.slug}`)}>{model.name}</a></h3><p class="card-description">{model.summary[lang]}</p><div class="tag-row">{model.tags.slice(0,3).map(tag=><span class="tag">{tag}</span>)}</div><div class="card-footer"><span><Icon name="cube" size={14}/>GKG {release.packageFormat}</span><a href={path(lang,`models/${model.slug}`)}>{t(lang,'了解模型','Explore model')}<Icon name="arrow" size={16}/></a></div></div>
+</article>

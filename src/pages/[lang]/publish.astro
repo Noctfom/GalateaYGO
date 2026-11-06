@@ -1,0 +1,130 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import {text as t,path,type Lang} from '../../lib/catalog';
+import {community} from '../../lib/community';
+export function getStaticPaths(){return ['zh','en'].map(lang=>({params:{lang}}));}
+const lang=Astro.params.lang as Lang;
+---
+<Layout lang={lang} active="publish" title={t(lang,'分享你的模型','Share your model')}>
+<div class="container page-content">
+  <div class="page-heading"><div class="eyebrow">FROM YOUR WORKSPACE TO THE COMMUNITY</div><h1>{t(lang,'让你的训练成果，被更多人看见','Give your model a place to be discovered.')}</h1><p>{t(lang,'选择部署包，整理介绍，再通过 GitHub 投稿','Choose a package, tell its story, then submit through GitHub.')}</p></div>
+  <div class="publish-layout"><div>
+    {!community.submissionUrl && <div class="notice">{t(lang,'社区投稿仓库尚未开放，可先保存完整资料。文件读取均在本地完成','Community submissions are not open yet. Save your complete draft now; file processing stays on your device.')}</div>}
+    <form id="publish-form">
+      <div class="section-title"><span>01</span><h2>{t(lang,'读取部署包','Read your package')}</h2></div>
+      <div class="package-picker">
+        <label for="gkg-file"><strong>{t(lang,'选择 GKG4 / GKG5 文件','Choose a GKG4 / GKG5 file')}</strong><span>{t(lang,'自动读取协议、训练轮次和附件信息，并计算 SHA256；文件不会上传','Read protocols, training counters and attachments, then calculate SHA256. The file is not uploaded.')}</span></label>
+        <input id="gkg-file" type="file" accept=".gkg" aria-describedby="package-status"/>
+        <div id="inspection-progress" hidden><progress id="gkg-progress" max="100" value="0"></progress><button id="cancel-inspection" type="button" class="text-link">{t(lang,'取消读取','Cancel')}</button></div>
+        <p id="package-status" role="status" aria-live="polite">{t(lang,'大包需要完整读取一次以计算摘要，可随时取消','Calculating the digest requires one full read of the file. You can cancel at any time.')}</p>
+        <div id="package-summary" hidden><dl id="package-facts"></dl><label for="artifact-select">{t(lang,'本次发布主要展示的模型','Model featured in this release')}</label><select id="artifact-select"></select><small>{t(lang,'保留包内所有制品，此选择只决定页面展示的训练轮次','All artifacts stay listed; this selection determines the counters shown on the page.')}</small></div>
+      </div>
+      <div class="section-title"><span>02</span><h2>{t(lang,'介绍你的模型','Introduce your model')}</h2></div>
+      <div class="form-fields">
+        <div class="form-row"><label>{t(lang,'模型名称','Model name')}<input name="name" required maxlength="100" placeholder={t(lang,'你的模型名称','Your model name')}/></label><label>{t(lang,'目录标识','Directory ID')}<input name="slug" required maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="my-galatea-model"/><small>{t(lang,'用于页面网址，更新同一模型时保持不变','Used in the page URL. Keep it for future releases of this project.')}</small></label></div>
+        <label>{t(lang,'一句话介绍','Short description')}<textarea name="summary" required maxlength="280" rows="3" placeholder={t(lang,'适合什么场景？有什么特点？','What is it for? What makes it different?')}></textarea></label>
+        <div class="form-row"><label>{t(lang,'作者 GitHub 账号','Author GitHub handle')}<input name="author" required maxlength="39" placeholder="GitHub username"/><small>{t(lang,'维护者会对照 GitHub 投稿核对作者','Maintainers check authorship against the GitHub submission.')}</small></label><label>{t(lang,'模型类型','Model category')}<select name="category"><option value="general">{t(lang,'通用对局','Generalist')}</option><option value="specialist">{t(lang,'专项训练','Specialist')}</option><option value="lightweight">{t(lang,'轻量部署','Lightweight')}</option></select></label></div>
+        <label>{t(lang,'使用说明与评测条件（可选）','Usage and evaluation notes (optional)')}<textarea name="notes" rows="4" maxlength="4000" placeholder={t(lang,'推荐卡组、客户端要求、已知限制；评测请注明对手、局数和策略设置','Recommended decks, client requirements and known limits. For evaluations include opponents, game count and policy settings.')}></textarea></label>
+        <details class="translation-fields"><summary>{t(lang,'补充英文介绍（可选）','Add a Chinese translation (optional)')}</summary><p>{t(lang,'未填写时英文页面显示原文，可在收录前补充翻译','If omitted, the Chinese page shows the original. A translation can be added before listing.')}</p><label>{t(lang,'英文简介','Chinese summary')}<textarea name="summaryOther" rows="2" maxlength="280"></textarea></label><label>{t(lang,'英文说明','Chinese notes')}<textarea name="notesOther" rows="3" maxlength="4000"></textarea></label></details>
+      </div>
+      <div class="section-title"><span>03</span><h2>{t(lang,'填写下载来源','Add a download source')}</h2></div>
+      <div class="form-fields">
+        <div class="form-row"><label>{t(lang,'发布版本名称','Release label')}<input name="releaseLabel" required maxlength="100" placeholder="galatea_iter_200_bc_5"/></label><label>{t(lang,'发布日期','Release date')}<input name="releaseDate" type="date" required/></label></div>
+        <label>{t(lang,'发布页面地址','Release page URL')}<input name="sourceUrl" type="url" required placeholder="https://github.com/you/model/releases/tag/v1.0"/><small>{t(lang,'供用户查看作者说明与发布来源','Lets readers review the author’s release notes and source.')}</small></label>
+        <label>{t(lang,'GKG 文件下载地址','GKG download URL')}<input name="downloadUrl" type="url" required placeholder="https://github.com/you/model/releases/download/v1.0/model.gkg"/><small>{t(lang,'指向所选 GKG 的具体版本，网站不保存或中转模型文件','Link to the selected GKG at a specific version. The website does not store or proxy models.')}</small></label>
+        <label>{t(lang,'许可证','License')}<input name="license" required maxlength="120" placeholder={t(lang,'你为模型声明的许可证','The license you chose for the model')}/></label>
+      </div>
+      <div class="form-actions"><button type="submit" class="button button-primary"><Icon name="download" size={17}/>{t(lang,'生成并保存投稿资料','Generate & save submission')}</button><span>{t(lang,'保存 JSON 后可检查内容再提交','Review the saved JSON before submitting')}</span></div><p id="form-feedback" role="status" aria-live="polite"></p>
+    </form>
+    <section id="submission-result" hidden><h2>{t(lang,'资料准备好了','Your submission is ready')}</h2><p>{t(lang,'复制 JSON，在 GitHub 投稿表单中粘贴并确认提交。维护者收录后才会出现在目录','Copy the JSON into the GitHub submission form and confirm there. A maintainer reviews it before listing.')}</p><div class="result-actions"><button id="copy-draft" type="button" class="button button-outline button-small"><Icon name="copy" size={14}/>{t(lang,'复制投稿 JSON','Copy submission JSON')}</button>{community.submissionUrl ? <a class="button button-primary button-small" href={community.submissionUrl} target="_blank" rel="noopener noreferrer">{t(lang,'打开 GitHub 投稿','Open GitHub submission')}<Icon name="arrow" size={14}/></a> : <span class="muted">{t(lang,'GitHub 投稿入口待开放','GitHub submissions are not open yet')}</span>}</div><details id="draft-preview"><summary>{t(lang,'检查生成的内容','Review generated content')}</summary><pre id="draft-json"></pre></details></section>
+  </div><aside class="publish-aside"><div class="aside-heading"><Icon name="spark" size={24}/><h2>{t(lang,'让成果更容易被使用','Make your work easier to use')}</h2></div><ol>
+    <li><strong>{t(lang,'文件由你保管','Your files, your repository')}</strong><p>{t(lang,'部署包保存在自己的 GitHub Release 或模型仓库，用户直接从原地址下载','Host the package in your GitHub Release or model repository. Users download directly from that source.')}</p></li>
+    <li><strong>{t(lang,'技术信息自动填写','Technical details come from the package')}</strong><p>{t(lang,'协议与轮次来自包内清单。摘要用于比对内容，实际兼容性由 Core / Link 导入时确认','Protocols and counters come from the manifest. The digest identifies content; Core / Link checks compatibility on import.')}</p></li>
+    <li><strong>{t(lang,'每次更新保留版本','Keep a record of each release')}</strong><p>{t(lang,'文件变化就新增发布记录，模型 UUID 可以保持不变，旧版本仍可追溯','Add a release when file contents change. The UUID can stay the same while earlier releases remain traceable.')}</p></li>
+  </ol><a class="text-link" href={path(lang,'docs/publish-model')}>{t(lang,'阅读发布指南','Read the publishing guide')}<Icon name="arrow" size={15}/></a></aside></div>
+</div></Layout>
+<script>
+import {buildSubmission} from '../../lib/submission.mjs';
+const chinese=document.documentElement.lang==='zh-CN';
+const lang=chinese?'zh':'en';
+const say=(zh:string,en:string)=>chinese?zh:en;
+const form=document.querySelector<HTMLFormElement>('#publish-form')!;
+const input=document.querySelector<HTMLInputElement>('#gkg-file')!;
+const status=document.querySelector<HTMLElement>('#package-status')!;
+const feedback=document.querySelector<HTMLElement>('#form-feedback')!;
+const summary=document.querySelector<HTMLElement>('#package-summary')!;
+const progressBox=document.querySelector<HTMLElement>('#inspection-progress')!;
+const progress=document.querySelector<HTMLProgressElement>('#gkg-progress')!;
+const selection=document.querySelector<HTMLSelectElement>('#artifact-select')!;
+const result=document.querySelector<HTMLElement>('#submission-result')!;
+const field=(name:string)=>form.elements.namedItem(name) as HTMLInputElement;
+let worker:Worker|null=null;
+let report:any=null;
+let draft='';
+const now=new Date();
+field('releaseDate').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+const invalidateDraft=()=>{draft='';result.hidden=true;feedback.textContent='';};
+form.addEventListener('input',invalidateDraft);
+form.addEventListener('change',invalidateDraft);
+const finish=()=>{worker?.terminate();worker=null;progressBox.hidden=true;};
+document.querySelector('#cancel-inspection')!.addEventListener('click',()=>{
+  finish();input.value='';report=null;summary.hidden=true;invalidateDraft();
+  status.textContent=say('已取消，可重新选择文件','Cancelled. Choose a file to start again.');
+});
+selection.addEventListener('change',()=>{field('releaseLabel').value=selection.value.replace(/\.(pth|onnx)$/i,'');});
+input.addEventListener('change',()=>{
+  finish();report=null;summary.hidden=true;invalidateDraft();
+  const file=input.files?.[0];
+  if(!file){status.textContent=say('请选择 GKG 文件','Choose a GKG file.');return;}
+  status.textContent=say('正在读取包内清单…','Reading the manifest…');progressBox.hidden=false;progress.value=0;
+  try{worker=new Worker(new URL('../../lib/gkg-worker.ts',import.meta.url),{type:'module'});}
+  catch{finish();status.textContent=say('无法启动本地读取线程，请使用新版浏览器','Could not start the local reader. Try a current browser.');return;}
+  worker.onmessage=({data})=>{
+    if(data.type==='progress'){
+      if(data.progress.phase==='hash'){
+        const percent=Math.floor(100*data.progress.loaded/data.progress.total);progress.value=percent;
+        status.textContent=say(`正在计算文件摘要 ${percent}%`,`Calculating file digest ${percent}%`);
+      }
+      return;
+    }
+    finish();
+    if(data.type==='error'){status.textContent=data.messages[lang];return;}
+    report=data.report;
+    const facts=document.querySelector('#package-facts')!;facts.replaceChildren();
+    const types:Record<string,string>=chinese?{decks:'卡组',replays:'回放',documents:'说明',presets:'预设'}:{decks:'Decks',replays:'Replays',documents:'Documents',presets:'Presets'};
+    const rows=[
+      [say('格式 / 协议','Format / protocol'),`GKG${report.packageFormat} · V${report.modelProtocol}`],
+      [say('文件大小','File size'),`${(report.sizeBytes/1048576).toFixed(1)} MiB`],
+      [say('模型身份','Model identity'),report.modelId],
+      [say('附件','Attachments'),report.attachments.map((key:string)=>`${types[key]} ${report.attachmentCounts[key]}`).join(' · ')||say('无','None')],
+      ['SHA256',report.sha256],
+    ];
+    for(const [label,value] of rows){const dt=document.createElement('dt');dt.textContent=label;const dd=document.createElement('dd');dd.textContent=value;facts.append(dt,dd);}
+    selection.replaceChildren();
+    for(const artifact of report.artifacts){const option=document.createElement('option');option.value=artifact.primary;option.textContent=`${artifact.primary} · PPO ${artifact.ppoIteration??'?'} / BC ${artifact.bcIteration??'?'}`;option.disabled=artifact.ppoIteration===null||artifact.bcIteration===null;selection.append(option);}
+    const first=[...selection.options].find(option=>!option.disabled);if(first)selection.value=first.value;
+    field('releaseLabel').value=selection.value.replace(/\.(pth|onnx)$/i,'');summary.hidden=false;
+    status.textContent=first?say('读取完成，文件未离开你的设备','Read complete. The file stayed on your device.'):say('此包缺少完整训练来源，请用当前 Core 重新打包','Training lineage is incomplete. Repackage with the current Core.');
+  };
+  worker.onerror=()=>{finish();status.textContent=say('本地读取中断，请重新选择文件','Local reading stopped. Choose the file again.');};
+  worker.postMessage(file);
+});
+form.addEventListener('submit',event=>{
+  event.preventDefault();if(!form.reportValidity())return;
+  try{
+    const body=buildSubmission(Object.fromEntries(new FormData(form)),report,selection.value,lang);
+    draft=JSON.stringify(body,null,2);document.querySelector('#draft-json')!.textContent=draft;result.hidden=false;
+    const url=URL.createObjectURL(new Blob([draft+'\n'],{type:'application/json;charset=utf-8'}));const anchor=document.createElement('a');anchor.href=url;anchor.download=`${body.model.id}-submission.json`;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    feedback.textContent=say('资料已保存，尚未提交到社区','Submission saved. It has not been sent to the community.');
+  }catch(error:any){feedback.textContent=error.messages?.[lang]||say('请检查填写内容','Please check the form.');}
+});
+document.querySelector('#copy-draft')!.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(draft);window.dispatchEvent(new CustomEvent('galatea:toast',{detail:say('投稿 JSON 已复制','Submission JSON copied')}));}
+  catch{(document.querySelector('#draft-preview') as HTMLDetailsElement).open=true;feedback.textContent=say('请手动复制下方 JSON','Please copy the JSON below manually.');}
+});
+window.addEventListener('pagehide',finish);
+</script>
+<style>
+.publish-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:56px}.section-title{display:flex;align-items:center;gap:14px;margin:30px 0 22px}.section-title>span{font-family:var(--serif);font-size:20px;color:#b4a0c5}.section-title h2{font-size:18px}.form-fields{display:grid;gap:20px}.form-fields label{display:flex;flex-direction:column;gap:8px;font-size:12px;color:#6b5e78}.form-fields input,.form-fields textarea,.form-fields select,.package-picker select{border:1px solid #dcd5e3;border-radius:6px;padding:12px;background:#fff;color:var(--ink);width:100%;font-size:13px}.form-fields textarea{resize:vertical}.form-fields small,.package-picker small{font-size:11px;color:var(--muted);line-height:1.7}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}.form-actions{margin-top:27px;display:flex;align-items:center;gap:20px}.form-actions>span{font-size:11px;color:var(--muted)}#form-feedback{font-size:12px;color:var(--purple);margin-top:15px}.publish-aside{border:1px solid #e4ddec;background:#f2eef6;border-radius:9px;padding:28px;margin-top:22px;align-self:start}.aside-heading{color:#8b71a1}.aside-heading h2{color:#51435f;font-size:20px;margin-top:17px}.publish-aside ol{padding-left:19px;margin-top:25px}.publish-aside li{padding-left:5px;margin-bottom:23px;color:#9d8caa;font-size:12px}.publish-aside li strong{color:#706079;font-weight:500;font-size:13px}.publish-aside li p{font-size:12px;line-height:1.9;margin-top:7px}.publish-aside .text-link{font-size:12px}.package-picker{border:1px dashed #bdb0cf;border-radius:10px;background:#f5f2f8;padding:24px}.package-picker>label{display:grid;gap:10px}.package-picker>label strong{font-size:15px;color:var(--purple)}.package-picker>label span{font-size:12px;color:var(--muted);line-height:1.8}.package-picker input{margin-top:18px;font-size:12px;max-width:100%}.package-picker input::file-selector-button{background:white;border:1px solid #cfc2df;padding:9px 14px;border-radius:5px;color:var(--purple);margin-right:12px;cursor:pointer}#package-status{font-size:12px;line-height:1.8;color:var(--muted);margin-top:16px}#inspection-progress:not([hidden]){display:flex;align-items:center;gap:15px;margin-top:18px}progress{accent-color:var(--purple);width:100%;height:8px}#package-facts{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px 15px;font-size:11px;margin:20px 0}#package-facts dt{color:var(--muted)}#package-facts dd{overflow-wrap:anywhere;color:var(--ink);margin:0}.package-picker select{margin:10px 0;font-size:12px}.package-picker #package-summary>label{font-size:12px}.translation-fields{border:1px solid var(--line);padding:16px;border-radius:7px;font-size:12px}.translation-fields summary,#draft-preview summary{cursor:pointer;color:var(--purple)}.translation-fields p{margin:12px 0;color:var(--muted)}.translation-fields label{margin-top:15px}#submission-result{margin-top:28px;background:#f2eef6;border:1px solid #dcd5e3;border-radius:9px;padding:24px}#submission-result h2{font-size:18px}#submission-result>p{font-size:12px;line-height:1.9;color:var(--muted);margin:12px 0 20px}.result-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.result-actions .muted{font-size:11px}#draft-preview{margin-top:20px;font-size:12px}#draft-preview pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;line-height:1.9;color:#7c668e;margin-top:15px;max-height:450px;overflow:auto}@media(max-width:900px){.publish-layout{gap:30px;grid-template-columns:minmax(0,1fr) 250px}}@media(max-width:760px){.publish-layout{grid-template-columns:1fr}.publish-aside{margin-top:0}.form-row{grid-template-columns:1fr}.form-actions{align-items:start;flex-direction:column;gap:12px}.form-fields input,.form-fields select,.form-fields textarea{font-size:16px}.package-picker{padding:18px}}
+</style>

@@ -1,0 +1,63 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { community } from '../../lib/community';
+import { text as t, path, type Lang } from '../../lib/catalog';
+
+export function getStaticPaths() {
+  return ['zh', 'en'].map(lang => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const entries = [
+  { icon: 'cube', title: t(lang, '分享你的模型', 'Share your model'), description: t(lang, '整理训练成果、版本信息和使用说明，让更多人了解你的模型', 'Prepare your model’s release information and usage notes for others to explore.'), action: t(lang, '准备发布资料', 'Prepare a submission'), href: path(lang, 'publish'), external: false },
+  { icon: 'book', title: t(lang, '从文档找到答案', 'Find your starting point'), description: t(lang, '了解模型选择、文件格式和本地使用方式，按自己的节奏开始', 'Learn about model selection, file formats and local usage at your own pace.'), action: t(lang, '阅读使用指南', 'Read the guides'), href: path(lang, 'docs'), external: false },
+  { icon: 'code', title: t(lang, '反馈 Core 问题', 'Report a Core issue'), description: t(lang, '遇到训练、部署或框架运行问题？带上版本和复现信息，到项目仓库反馈', 'For training, deployment or framework issues, include the version and reproduction details in the project repository.'), action: t(lang, '前往 GitHub Issues', 'Open GitHub Issues'), href: 'https://github.com/Noctfom/Galatea-Core/issues', external: true },
+];
+if (community.repositoryUrl) entries[2] = {
+  icon: 'code', title: t(lang, '一起完善 GalateaYGO', 'Build GalateaYGO together'),
+  description: t(lang, '反馈网站问题、完善使用说明，或帮助核对社区模型的发布信息', 'Report website issues, improve the guides or help review community model releases.'),
+  action: t(lang, '前往网站仓库', 'Open the website repository'), href: community.repositoryUrl, external: true,
+};
+---
+
+<Layout lang={lang} active="community" title={t(lang, '参与社区', 'Community')}>
+  <div class="container page-content">
+    <header class="page-heading">
+      <span class="eyebrow">{t(lang, '一起探索', 'EXPLORE TOGETHER')}</span>
+      <h1>{t(lang, '交流每一种对局思路', 'Room for every playstyle')}</h1>
+      <p>{t(lang, '分享模型、记录发现，让每一次尝试都有机会被看见', 'Share models and discoveries, and give every experiment a place to grow.')}</p>
+    </header>
+
+    <div class="community-grid">
+      {entries.map(entry => <section class="community-tile">
+        <span class="community-icon"><Icon name={entry.icon} size={25}/></span>
+        <h2>{entry.title}</h2><p>{entry.description}</p>
+        <a class="text-link" href={entry.href} target={entry.external ? '_blank' : undefined} rel={entry.external ? 'noopener noreferrer' : undefined}>{entry.action}<Icon name={entry.external ? 'external' : 'arrow'} size={16}/></a>
+      </section>)}
+    </div>
+
+    <section class="notice discussion-notice" aria-labelledby="discussion-title">
+      <span class="discussion-icon"><Icon name="message" size={24}/></span>
+      <div><h2 id="discussion-title">{community.discussionsUrl ? t(lang, '到社区交流你的发现', 'Share what you discover') : t(lang, '社区讨论区正在准备中', 'The discussion space is being prepared')}</h2>
+        <p>{community.discussionsUrl
+          ? t(lang, '使用 GitHub 账号交流模型体验与训练思路，浏览讨论无需登录。具体模型的问题也可以在模型详情页找到讨论入口', 'Use your GitHub account to discuss model experiences and training ideas. Reading discussions needs no sign-in. Model pages also provide discussion entries for individual models.')
+          : t(lang, '模型页评论暂未开放。你现在可以浏览模型、阅读文档，或先准备好发布资料', 'Model-page comments are not open yet. You can browse models, read the guides or prepare a submission in the meantime.')}</p>
+        {community.discussionsUrl && <a class="text-link discussion-open" href={community.discussionsUrl} target="_blank" rel="noopener noreferrer">{t(lang, '打开 GitHub Discussions', 'Open GitHub Discussions')}<Icon name="external" size={15}/></a>}
+      </div>
+    </section>
+
+    <div class="community-bottom"><p>{t(lang, '从一个模型、一份说明，或一次有帮助的反馈开始', 'Begin with a model, a helpful guide, or thoughtful feedback.')}</p><a class="text-link" href={path(lang, 'models')}>{t(lang, '探索模型广场', 'Explore the models')}<Icon name="arrow" size={16}/></a></div>
+  </div>
+</Layout>
+
+<style>
+  .community-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;background:#eee9f6;color:#765398;border:1px solid #e5dced;margin-bottom:25px}
+  .community-tile h2{font-size:21px;letter-spacing:-.025em;margin:0 0 12px}.community-tile p{font-size:14px;line-height:1.9;color:#82788b;margin:0 0 27px}
+  .community-tile .text-link{display:inline-flex;align-items:center;gap:9px;font-size:13px;margin-top:auto}
+  .discussion-notice{display:flex;align-items:flex-start;gap:19px;margin-top:32px;padding:27px 30px;background:#f0edf4;border:1px solid #e5deed;border-radius:12px}.discussion-icon{color:#8c70a8;flex-shrink:0;padding-top:3px}
+  .discussion-notice h2{font-size:16px;margin:0 0 8px;font-weight:600;letter-spacing:-.02em}.discussion-notice p{color:#887c94;font-size:13px;line-height:1.9;margin:0;max-width:850px}
+  .discussion-open{display:inline-flex;align-items:center;gap:8px;font-size:12px;margin-top:15px}
+  .community-bottom{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-top:38px;color:#8c8493;font-size:13px}.community-bottom p{margin:0;line-height:1.8}.community-bottom a{display:flex;align-items:center;gap:9px;flex-shrink:0}
+  @media(max-width:650px){.discussion-notice{padding:23px 20px;gap:13px}.community-bottom{flex-direction:column;align-items:flex-start}}
+</style>

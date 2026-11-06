@@ -1,0 +1,51 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Icon from '../../../components/Icon.astro';
+import { text as t, path, type Lang } from '../../../lib/catalog';
+import { guides } from '../../../data/guides';
+
+export function getStaticPaths() {
+  return ['zh', 'en'].map(lang => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const icons = ['book', 'spark', 'git', 'layers'];
+---
+
+<Layout lang={lang} active="docs" title={t(lang, '使用文档', 'Documentation')}>
+  <div class="container page-content">
+    <header class="page-heading">
+      <span class="eyebrow">{t(lang, '文档与指南', 'DOCUMENTATION')}</span>
+      <h1>{t(lang, '从第一场对局开始', 'Start with your first duel')}</h1>
+      <p>{t(lang, '了解模型、选择版本，或者把自己的训练成果分享给更多人', 'Understand models, choose a release, or share your training work with others.')}</p>
+    </header>
+
+    <div class="guide-grid">
+      {guides.map((guide, index) => (
+        <a class="guide-card" href={path(lang, `docs/${guide.slug}`)}>
+          <div class="guide-card-top"><span class="guide-icon"><Icon name={icons[index]} size={23}/></span><span class="tag">{guide.category[lang]}</span></div>
+          <h2>{guide.title[lang]}</h2>
+          <p>{guide.summary[lang]}</p>
+          <div class="guide-card-bottom"><span><Icon name="clock" size={14}/>{t(lang, `约 ${guide.readMinutes} 分钟`, `${guide.readMinutes} min read`)}</span><Icon name="arrow" size={19}/></div>
+        </a>
+      ))}
+    </div>
+
+    <section class="docs-next">
+      <div><h2>{t(lang, '需要框架的完整使用说明？', 'Looking for the full framework documentation?')}</h2><p>{t(lang, '安装、训练和本地部署的详细操作，请查看 Galatea-Core 的项目文档', 'For installation, training and local deployment instructions, visit the Galatea-Core documentation.')}</p></div>
+      <a class="button button-outline" href="https://github.com/Noctfom/Galatea-Core#readme" target="_blank" rel="noopener noreferrer">{t(lang, 'Core 项目文档', 'Core documentation')}<Icon name="external" size={16}/></a>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .guide-card-top,.guide-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .guide-icon{display:grid;place-items:center;width:47px;height:47px;background:#eee9f6;border:1px solid #e4dced;border-radius:12px;color:#72539b}
+  .guide-card h2{font-size:21px;line-height:1.5;margin:23px 0 10px;letter-spacing:-.025em}
+  .guide-card p{color:#77727d;font-size:14px;line-height:1.9;margin:0 0 28px}
+  .guide-card-bottom{color:#85778d;font-size:12px;margin-top:auto}
+  .guide-card-bottom span{display:flex;align-items:center;gap:7px}
+  .docs-next{margin-top:48px;padding:30px 0;border-top:1px solid #e5e1e7;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .docs-next h2{font-size:19px;margin:0 0 8px;letter-spacing:-.02em}.docs-next p{color:#77727d;font-size:14px;line-height:1.8;margin:0}.docs-next .button{flex-shrink:0}
+  @media(max-width:650px){.docs-next{align-items:flex-start;flex-direction:column}.guide-card h2{font-size:19px}}
+</style>
