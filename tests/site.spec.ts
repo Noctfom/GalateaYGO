@@ -82,6 +82,22 @@ test('中文首页可访问，并能切换到英文首页', async ({ page }) => 
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
 });
 
+test('首页展示真实卡图，社区提供项目与公开联系方式', async ({ page }) => {
+  const requests: string[] = [];
+  page.on('request', request => { if (request.url().includes('/cards/')) requests.push(request.url()); });
+  await page.goto('/zh/');
+  await expect(page.locator('.hero-card-photo img[src]')).toHaveCount(3);
+  await expect(page.locator('.card-front img[src]')).toHaveAttribute('src', /\/cards\/dm\//);
+  await expect(page.locator('.card-middle img[src]')).toHaveAttribute('src', /\/cards\/orcust\//);
+  await page.waitForFunction(() => Array.from(document.querySelectorAll<HTMLImageElement>('.hero-card-photo img[src]')).every(image => image.complete && image.naturalWidth > 0));
+  expect(requests).toHaveLength(3);
+  await expect(page.locator('.ecosystem-bar a[href="https://github.com/Noctfom/Galatea-Link"]')).toBeVisible();
+  await page.goto('/zh/community/');
+  await expect(page.getByText('492420925', { exact: true })).toBeVisible();
+  await expect(page.locator('a[href="mailto:noctfom114514@outlook.com"]')).toBeVisible();
+  await expect(page.locator('.star-link')).toHaveCount(2);
+});
+
 test('模型搜索可按名称和标签过滤，并能清除无结果状态', async ({ page }) => {
   await page.goto('/zh/models/');
   const visibleCards = page.locator('[data-model-card]:visible');

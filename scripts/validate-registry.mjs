@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateInspection } from '../src/lib/gkg.mjs';
+import { validatePublishedRegistry } from './moderation/policy.mjs';
 
 const categories = new Set(['general', 'specialist', 'lightweight']);
 const accents = new Set(['violet', 'amber', 'teal']);
@@ -140,6 +141,7 @@ if (invokedPath === fileURLToPath(import.meta.url)) {
   for (const [file, allowExamples] of files) {
     try {
       const data = JSON.parse(readFileSync(resolve(root, file), 'utf8'));
+      if (!allowExamples) validatePublishedRegistry(data, JSON.parse(readFileSync(resolve(root, 'registry/moderation-log.json'), 'utf8')));
       const errors = validateRegistry(data, { allowExamples });
       if (errors.length) {
         invalid = true;

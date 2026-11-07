@@ -1,0 +1,118 @@
+name: Review model submission
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'scan 检查 / publish 批准后生成 PR / withdraw 撤回后生成 PR'
+        type: choice
+        options: [scan, publish, withdraw]
+        default: scan
+        required: true
+      issue:
+        description: '投稿 Issue 编号，撤回时留空'
+        type: string
+      package_sha256:
+        description: '批准或撤回的完整包 SHA256，检查时留空'
+        type: string
+      draft_sha256:
+        description: '检查报告中的投稿 SHA256，批准时必填'
+        type: string
+      reason:
+        description: '撤回原因'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: model-moderation
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: read
+    outputs:
+      action: ${{ steps.prepare.outputs.action }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18.0'
+          cache: npm
+      - run: npm ci
+      - name: Check administrator and read submission
+        id: prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/moderation/run.mjs prepare
+      - name: Download fixed GitHub release without credentials
+        if: steps.prepare.outputs.action != 'withdraw'
+        run: node scripts/moderation/run.mjs download
+      - name: Build isolated scanner
+        if: steps.prepare.outputs.action != 'withdraw'
+        run: docker build --tag galateaygo-review scripts/moderation
+      - name: Inspect package without network or credentials
+        if: steps.prepare.outputs.action != 'withdraw'
+        run: |
+          mkdir -p .review/results .review/scratch
+          docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" --cpus 2 --memory 4g --pids-limit 64 \
+            --tmpfs /tmp:rw,noexec,nosuid,size=64m --env TMPDIR=/scratch \
+            --mount "type=bind,src=$PWD/.review/scratch,dst=/scratch" \
+            --mount "type=bind,src=$PWD/src,dst=/app/src,readonly" \
+            --mount "type=bind,src=$PWD/scripts,dst=/app/scripts,readonly" \
+            --mount "type=bind,src=$PWD/registry,dst=/app/registry,readonly" \
+            --mount "type=bind,src=$PWD/node_modules,dst=/app/node_modules,readonly" \
+            --mount "type=bind,src=$PWD/.review,dst=/input,readonly" \
+            --mount "type=bind,src=$PWD/.review/results,dst=/output" galateaygo-review
+      - name: Compare downloaded manifest and submission
+        if: steps.prepare.outputs.action != 'withdraw'
+        run: node scripts/moderation/run.mjs report
+      - name: Save small inspection reports only
+        if: always() && steps.prepare.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: moderation-report
+          retention-days: 14
+          path: |
+            .review/request.json
+            .review/results/*.json
+          if-no-files-found: error
+
+  proposal:
+    needs: inspect
+    if: needs.inspect.outputs.action == 'publish' || needs.inspect.outputs.action == 'withdraw'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18.0'
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: moderation-report
+          path: .review
+      - name: Recheck permission and open a review PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/moderation/run.mjs propose

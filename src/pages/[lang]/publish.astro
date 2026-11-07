@@ -12,6 +12,7 @@ const lang=Astro.params.lang as Lang;
   <div class="publish-layout"><div>
     {!community.submissionUrl && <div class="notice">{t(lang,'社区投稿仓库尚未开放，可先保存完整资料。文件读取均在本地完成','Community submissions are not open yet. Save your complete draft now; file processing stays on your device.')}</div>}
     <form id="publish-form">
+      <div class="notice">{t(lang, '投稿经包体检查和管理员批准后上架。首版自动审核支持公开 GitHub Release 中不超过 2 GiB 的 GKG；文档可用 Markdown、纯文本或常见图片，暂不接收 PDF、SVG、可执行文件。预设仅作为资料携带，不会自动运行', 'Submissions require package checks and administrator approval. Automated review currently supports GKG files up to 2 GiB in public GitHub Releases. Use Markdown, plain text or common images for documentation; PDF, SVG and executables are not accepted yet. Presets are carried as data and never run automatically.')}</div>
       <div class="section-title"><span>01</span><h2>{t(lang,'读取部署包','Read your package')}</h2></div>
       <div class="package-picker">
         <label for="gkg-file"><strong>{t(lang,'选择 GKG4 / GKG5 文件','Choose a GKG4 / GKG5 file')}</strong><span>{t(lang,'自动读取协议、训练轮次和附件信息，并计算 SHA256；文件不会上传','Read protocols, training counters and attachments, then calculate SHA256. The file is not uploaded.')}</span></label>

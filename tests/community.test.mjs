@@ -2,13 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readCommunityConfig, resolveCommunityConfig } from '../src/lib/community.ts';
 
-test('正式部署无需环境变量即可连接社区，内嵌评论仍需完整配置', () => {
+test('正式部署无需环境变量即可连接社区和已授权的评论分类', () => {
   const result = resolveCommunityConfig();
   assert.equal(result.repositoryUrl, 'https://github.com/Noctfom/GalateaYGO');
   assert.equal(result.submissionUrl, 'https://github.com/Noctfom/GalateaYGO/issues/new?template=model-submission.yml');
   assert.equal(result.discussionsUrl, 'https://github.com/Noctfom/GalateaYGO/discussions');
-  assert.equal(result.discussionEnabled, false);
-  assert.equal(result.giscus, null);
+  assert.equal(result.discussionEnabled, true);
+  assert.deepEqual(result.giscus, { repoId: 'R_kgDOVlSM_Q', category: 'Announcements', categoryId: 'DIC_kwDOVlSM_c4DKhyU' });
+  assert.equal(resolveCommunityConfig({ PUBLIC_COMMUNITY_REPOSITORY: 'another-owner/community' }).giscus, null);
+  assert.equal(resolveCommunityConfig({ PUBLIC_GITHUB_DISCUSSIONS_ENABLED: 'false' }).giscus, null);
 });
 
 test('派生站点可覆盖仓库并明确关闭讨论', () => {

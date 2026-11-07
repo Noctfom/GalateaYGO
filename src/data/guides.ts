@@ -110,8 +110,8 @@ export const guides: Guide[] = [
       {
         title: { zh: '由你选择文件托管位置', en: 'Choose where to host your files' },
         body: {
-          zh: '模型文件由发布者托管，GalateaYGO 收录说明和下载地址。GitHub Releases 适合小于 2 GiB 的单个文件；较大的文件可选择支持该体积的模型仓库。提供指向具体版本的地址，避免同一个下载链接悄悄变成另一个模型。',
-          en: 'Publishers host their files; GalateaYGO lists documentation and download links. GitHub Releases supports individual files smaller than 2 GiB. Larger files can use a model repository that supports their size. Link to a specific release rather than silently changing the content behind one download URL.',
+          zh: '模型文件由发布者托管，GalateaYGO 收录说明和下载地址。首版自动审核支持公开 GitHub Release 中不超过 2 GiB 的 GKG 文件。提供指向固定版本标签的下载地址，不使用 latest。较大的包需要先拆分发布，其他托管来源暂未接入自动审核。',
+          en: 'Publishers host their files; GalateaYGO lists descriptions and download links. Automated review currently supports GKG files up to 2 GiB in public GitHub Releases. Use a fixed release tag rather than latest. Split larger packages first; other hosting sources are not yet supported by the review workflow.',
         },
       },
       {
@@ -124,8 +124,8 @@ export const guides: Guide[] = [
       {
         title: { zh: '生成投稿资料', en: 'Prepare submission information' },
         body: {
-          zh: '在发布页选择本地 GKG，网页会在后台读取清单并分块计算文件摘要，不上传或运行模型。多模型包可以选择主要展示的版本。填写介绍、许可证和下载地址后保存 JSON；社区仓库开放后，复制 JSON 到 GitHub 投稿表单，确认提交并等待维护者收录。每次文件内容变化都新增发布记录，保留旧版本。',
-          en: 'Choose a local GKG on the publishing page. A background reader reads its manifest and hashes the file in chunks without uploading or running the model. Select the featured artifact in a multi-model package. Add your description, license and download links, then save the JSON. Once the community repository is open, copy it into the GitHub submission form, confirm and wait for maintainer review. Add a release when file contents change and retain earlier versions.',
+          zh: '在发布页选择本地 GKG，网页会在后台读取清单并分块计算文件摘要，不上传或运行模型。多模型包可以选择主要展示的版本。填写介绍、许可证和下载地址后保存 JSON，复制到 GitHub 投稿表单并确认提交。管理员检查实际包体和来源，批准并合并后才会出现在目录。每次文件内容变化都新增发布记录，旧摘要的批准不能用于新文件。',
+          en: 'Choose a local GKG on the publishing page. A background reader reads its manifest and hashes the file without uploading or running it. Select the featured artifact, add your description, license and download links, then copy the saved JSON into the GitHub submission form. An administrator checks the downloaded package and its provenance; it is listed after approval and merging. Changed files require a new release and review.',
         },
       },
     ],

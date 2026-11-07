@@ -37,6 +37,18 @@ if (community.repositoryUrl) entries[2] = {
       </section>)}
     </div>
 
+    <section class="contact-panel" aria-labelledby="contact-title">
+      <div><span class="eyebrow">GALATEA</span><h2 id="contact-title">{t(lang, '项目与联系', 'Projects & contact')}</h2></div>
+      <div class="project-links">
+        <a href="https://github.com/Noctfom/Galatea-Core" target="_blank" rel="noopener noreferrer"><Icon name="code" size={20}/><span>Galatea Core<small>{t(lang, '训练框架', 'Training framework')}</small></span><span class="star-link"><Icon name="star" size={14}/> Star</span></a>
+        <a href="https://github.com/Noctfom/Galatea-Link" target="_blank" rel="noopener noreferrer"><Icon name="layers" size={20}/><span>Galatea Link<small>{t(lang, '模型接入与对局助手', 'Model client & duel assistant')}</small></span><span class="star-link"><Icon name="star" size={14}/> Star</span></a>
+      </div>
+      <div class="contact-links">
+        <div><span>{t(lang, 'QQ 交流群', 'QQ group')}</span><strong>492420925</strong><button class="contact-copy" type="button" data-copy="492420925" aria-label={t(lang, '复制 QQ 群号', 'Copy QQ group number')}><Icon name="copy" size={16}/></button></div>
+        <div><span>{t(lang, '联系作者', 'Contact the author')}</span><a href="mailto:noctfom114514@outlook.com">noctfom114514@outlook.com</a></div>
+      </div>
+    </section>
+
     <section class="notice discussion-notice" aria-labelledby="discussion-title">
       <span class="discussion-icon"><Icon name="message" size={24}/></span>
       <div><h2 id="discussion-title">{community.discussionsUrl ? t(lang, '到社区交流你的发现', 'Share what you discover') : t(lang, '社区讨论区正在准备中', 'The discussion space is being prepared')}</h2>
@@ -52,6 +64,13 @@ if (community.repositoryUrl) entries[2] = {
 </Layout>
 
 <style>
+  .contact-panel{margin-top:32px;padding:28px 30px;border:1px solid #e5deed;border-radius:12px;background:#fffdf9}
+  .contact-panel h2{font-size:21px;margin:8px 0 22px}.project-links{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .project-links>a{display:flex;align-items:center;gap:14px;padding:18px;border:1px solid #e5deed;border-radius:8px;color:#4d3c60}
+  .project-links small{display:block;font-size:12px;margin-top:5px;color:#82788b}.star-link{display:flex;gap:5px;align-items:center;margin-left:auto;font-size:12px}
+  .contact-links{display:flex;flex-wrap:wrap;gap:20px 42px;margin-top:24px;font-size:14px}.contact-links>div{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.contact-links>div>span{color:#82788b}.contact-links a{overflow-wrap:anywhere}
+  .contact-copy{display:inline-flex;border:0;background:transparent;color:#765398;cursor:pointer;padding:5px}.contact-copy:hover{background:#eee9f6;border-radius:4px}
+  @media(max-width:650px){.contact-panel{padding:23px 20px}.project-links{grid-template-columns:1fr}.contact-links{gap:18px}.contact-links>div{gap:8px}}
   .community-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;background:#eee9f6;color:#765398;border:1px solid #e5dced;margin-bottom:25px}
   .community-tile h2{font-size:21px;letter-spacing:-.025em;margin:0 0 12px}.community-tile p{font-size:14px;line-height:1.9;color:#82788b;margin:0 0 27px}
   .community-tile .text-link{display:inline-flex;align-items:center;gap:9px;font-size:13px;margin-top:auto}

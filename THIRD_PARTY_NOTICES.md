@@ -33,6 +33,28 @@
 - 许可证：MIT，https://github.com/paulmillr/noble-hashes/blob/main/LICENSE
 - 两者是实际运行依赖，版本固定在锁文件中；模型文件不会发送给这些项目或外部服务
 
+## 审核器依赖
+
+审核器的实际依赖单独安装在 GitHub Actions 中，不进入网站前端：
+
+- [Picklescan](https://github.com/mmaitre314/picklescan)：Pickle 静态引用检查，MIT
+- [ONNX](https://github.com/onnx/onnx)：模型图与外部张量结构检查，Apache-2.0
+- [NumPy](https://github.com/numpy/numpy)：数值数组头检查，BSD-3-Clause
+- [PyYAML](https://github.com/yaml/pyyaml)：YAML 事件解析，MIT
+- [Pillow](https://github.com/python-pillow/Pillow)：图片格式检查，MIT-CMU
+- 其余传递依赖和固定版本见 `scripts/moderation/requirements.txt`，许可证以各项目所附原文为准
+- 审核器不执行模型，静态检查也不构成无恶意内容或无训练投毒的保证
+
+## 首页卡图
+
+首页的卡背、DM 与自奏卡图由项目维护者提供，来自其整理的游戏王 Master Duel 卡图导出素材。发布资源位于 `public/cards/`，仅进行了等比例缩放与 WebP 压缩，没有重绘卡面。游戏王卡牌、插图及商标的权利属于相应权利人，不随本项目代码许可证重新授权；本网站为非官方社区项目
+
+DM 卡图：22634473、38517737、46986417、47222536、55410871
+
+自奏卡图：39752820、48835607、90351981、92562411、93920420
+
+卡图压缩在开发阶段使用 [sharp](https://github.com/lovell/sharp)（Apache-2.0），由 Astro 的已有依赖提供，不增加浏览器运行依赖
+
 ## 功能与信息组织参考
 
 ### Hugging Face Model Cards

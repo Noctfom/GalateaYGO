@@ -8,3 +8,5 @@ test-results/
 playwright-report/
 .preview/
 .DS_Store
+.review/
+__pycache__/

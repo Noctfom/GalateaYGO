@@ -1,0 +1,4 @@
+# 发布目录与审核规则由项目管理员复核
+/registry/ @Noctfom
+/scripts/moderation/ @Noctfom
+/.github/ @Noctfom

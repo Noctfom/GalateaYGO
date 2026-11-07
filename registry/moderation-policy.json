@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "repository": "Noctfom/GalateaYGO",
+  "roles": {
+    "reviewers": [{ "id": 108326711, "login": "Noctfom" }],
+    "publishers": [{ "id": 108326711, "login": "Noctfom" }],
+    "administrators": [{ "id": 108326711, "login": "Noctfom" }]
+  },
+  "aiReviewEnabled": false,
+  "limits": {
+    "packageBytes": 2147483648,
+    "expandedBytes": 8589934592,
+    "memberBytes": 2147483648,
+    "memberCount": 16640,
+    "compressionRatio": 1000,
+    "manifestBytes": 33554432,
+    "textBytes": 16777216,
+    "jsonBytes": 536870912,
+    "pickleBytes": 33554432,
+    "downloadSeconds": 600
+  },
+  "downloadHosts": ["github.com"],
+  "redirectHosts": ["github.com", "release-assets.githubusercontent.com", "objects.githubusercontent.com"],
+  "attachments": {
+    "decks": [".ydk"],
+    "replays": [".json", ".jsonl", ".jsonl.gz", ".yrp", ".yrp2", ".yrp3", ".yrp3d", ".yrpx"],
+    "documents": [".md", ".txt", ".png", ".jpg", ".jpeg", ".gif", ".webp"],
+    "presets": [".json", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".txt"]
+  }
+}

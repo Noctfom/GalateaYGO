@@ -43,11 +43,23 @@ export function readCommunityConfig(env: PublicEnvironment) {
 
 // 公开仓库配置随源码部署，环境变量可用于派生站点覆盖
 export function resolveCommunityConfig(env: PublicEnvironment = {}) {
-  return readCommunityConfig({
+  const values: PublicEnvironment = {
     PUBLIC_COMMUNITY_REPOSITORY: 'Noctfom/GalateaYGO',
     PUBLIC_GITHUB_DISCUSSIONS_ENABLED: 'true',
     ...env,
-  });
+  };
+  // 派生仓库不继承本站的讨论分类，显式关闭讨论时也不加载评论
+  const fields = ['PUBLIC_GISCUS_REPO_ID', 'PUBLIC_GISCUS_CATEGORY', 'PUBLIC_GISCUS_CATEGORY_ID'];
+  if (values.PUBLIC_COMMUNITY_REPOSITORY === 'Noctfom/GalateaYGO'
+      && values.PUBLIC_GITHUB_DISCUSSIONS_ENABLED === 'true'
+      && !fields.some(key => typeof values[key] === 'string' && (values[key] as string).trim())) {
+    Object.assign(values, {
+      PUBLIC_GISCUS_REPO_ID: 'R_kgDOVlSM_Q',
+      PUBLIC_GISCUS_CATEGORY: 'Announcements',
+      PUBLIC_GISCUS_CATEGORY_ID: 'DIC_kwDOVlSM_c4DKhyU',
+    });
+  }
+  return readCommunityConfig(values);
 }
 
 // 这些值仅用于公开链接和评论配置，不接收 GitHub 令牌

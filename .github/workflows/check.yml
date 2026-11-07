@@ -3,6 +3,7 @@ name: Check website
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,3 +24,22 @@ jobs:
         run: npm test
       - name: Build production website
         run: npm run build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/moderation/requirements.txt
+      - name: Install static inspection dependencies
+        run: python -m pip install -r scripts/moderation/requirements.txt
+      - name: Test package review without running model weights
+        run: python -m unittest discover -s tests -p test_moderation.py
+      - name: Check isolated scanner runtime
+        run: |
+          docker build --tag galateaygo-review scripts/moderation
+          docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" --cpus 2 --memory 4g --pids-limit 64 \
+            --tmpfs /tmp:rw,noexec,nosuid,size=128m \
+            --mount "type=bind,src=$PWD/scripts,dst=/app/scripts,readonly" \
+            --mount "type=bind,src=$PWD/tests,dst=/app/tests,readonly" \
+            --mount "type=bind,src=$PWD/registry,dst=/app/registry,readonly" \
+            galateaygo-review sh -c 'node --version && python -m unittest discover -s tests -p test_moderation.py'

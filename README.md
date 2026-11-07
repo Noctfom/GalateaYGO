@@ -2,6 +2,8 @@
 
 GalateaYGO 是面向 Galatea 模型使用者与创作者的官网和模型目录，提供中文优先、支持英文的模型介绍、版本浏览和使用文档
 
+网站：[galateaygo.link](https://galateaygo.link/zh/) · [Galatea Core](https://github.com/Noctfom/Galatea-Core) · [Galatea Link](https://github.com/Noctfom/Galatea-Link)
+
 网站采用 Astro 静态构建，面向 Cloudflare Pages 部署。模型文件由发布者自行存放在 GitHub Releases 或其他模型仓库，网站保留轻量目录与下载来源
 
 ## 本地运行
@@ -35,12 +37,12 @@ npm run build:demo
 - 本地搜索与筛选，以及模型使用说明
 - 独立的版本化模型清单
 - GKG4/5 本地读取、文件摘要与投稿资料生成
-- GitHub Issue 投稿模板与可选 giscus 模型讨论
+- GitHub Issue 投稿、giscus 模型讨论与人工批准的包体审核
 - Cloudflare Pages 静态构建产物
 
-当前版本为 0.2.0。社区仓库为 [Noctfom/GalateaYGO](https://github.com/Noctfom/GalateaYGO)，作者生成投稿资料后复制 JSON 并前往 GitHub 确认提交。网站不代作者创建 Issue，也不运行模型推理或自动安装本地客户端
+当前版本为 0.3.0。社区仓库为 [Noctfom/GalateaYGO](https://github.com/Noctfom/GalateaYGO)，作者生成投稿资料后复制 JSON 并前往 GitHub 确认提交。网站不代作者创建 Issue，也不运行模型推理或自动安装本地客户端
 
-首页展示卡使用原创插画和游戏王卡面式的名称、属性、等级与效果栏，卡面不是可用于对局的真实卡牌
+首页使用项目维护者提供的游戏王卡图：左侧为卡背，DM 和自奏各从五张候选图中随机显示一张。网页每次打开只加载选中的图片，不轮播；素材来源与权利说明见第三方来源文档
 
 ## 目录数据
 
@@ -82,17 +84,17 @@ npm run inspect:gkg -- /path/to/model.gkg --output metadata.json
 
 该报告用于核对包清单与文件摘要，不代替完整 Core 导入检查，也不证明作者身份或授权关系。命令行生成的技术报告与网站完整投稿 JSON 是两种文件，前者不含作者介绍和下载地址
 
-## 维护者收录
+## 维护者审核
 
-下载投稿 JSON，核对 GitHub 投稿人、模型来源、许可证和具体下载版本。生成待审查目录：
+完整操作步骤见 [模型投稿审核](docs/moderation.md)，包括首次 GitHub 权限设置、分支保护、检查、批准与撤回
 
-```sh
-npm run submission -- submission.json registry.candidate.json
-```
+在 GitHub Actions 的 **Review model submission** 工作流中，先用 `scan` 检查 Issue；核对来源与报告后，用 `publish` 确认包和投稿两个摘要。系统重新下载并检查，生成待合并 PR；合并到 main 后才发布。`withdraw` 可撤回指定摘要，保留原发布资料与原因
 
-命令只写新的候选文件，不覆盖正式目录。新项目加入目录；同项目新版本追加记录，保留旧版本、原有介绍和维护者精选设置。重复文件、作者或路由冲突会提示人工核对。审查候选差异后更新 `registry/models.json`，如需修改原有项目介绍一并手动编辑，运行 `npm test` 与 `npm run build` 后提交 PR
+`registry/moderation-policy.json` 配置管理员和检查范围，当前只授权 Noctfom，AI 审核关闭。`registry/moderation-log.json` 保留发布与撤回记录；正式构建拒绝缺少匹配批准记录的条目。审核任务使用临时隔离容器，模型与附件不会进入网站托管
 
-技术清单由作者浏览器生成，属于投稿资料而非可信认证。不要直接执行投稿附带的 PTH；核对文件摘要时可下载 GKG 后运行上述读取命令。网站的 CI 仅校验静态资料与构建，不自动执行投稿内容
+首版自动审核支持公开 GitHub Release 中不超过 2 GiB 的 GKG；PDF、SVG 等复杂附件暂不接收。文件检查通过不等于模型没有训练投毒，也不代替作者授权、许可证及评测说明的人工核对
+
+`npm run submission -- submission.json registry.candidate.json` 仍可用于本地草稿对比，生成的新候选文件没有批准记录，不能直接替换正式目录上线
 
 ## 连接 GitHub 社区
 
@@ -105,7 +107,9 @@ PUBLIC_COMMUNITY_REPOSITORY=你的账号/GalateaYGO
 PUBLIC_GITHUB_DISCUSSIONS_ENABLED=true
 ```
 
-覆盖仓库时，应确认新仓库也有投稿模板和 Discussions；未开启讨论时设置 `PUBLIC_GITHUB_DISCUSSIONS_ENABLED=false`。嵌入评论还需要为该仓库安装 [giscus GitHub App](https://github.com/apps/giscus)，在 [giscus 配置页](https://giscus.app/zh-CN) 选择该仓库与讨论分类，将生成的仓库 ID、分类名称和分类 ID 填入本地 `.env` 或 Cloudflare 构建环境变量。未配置时保留 GitHub 讨论外链
+正式站点已接入 giscus 的 `Announcements` 分类，公开仓库 ID 与分类 ID 随源码部署，无需再次配置环境变量。模型页只在用户点击后加载评论；暂无真实模型时，没有对应的模型评论页
+
+派生站点覆盖仓库时，不继承本站 giscus 分类。需为自己的仓库安装 [giscus GitHub App](https://github.com/apps/giscus)，在 [giscus 配置页](https://giscus.app/zh-CN) 获取仓库 ID、分类名称和分类 ID，填写三项环境变量。未开启讨论时设置 `PUBLIC_GITHUB_DISCUSSIONS_ENABLED=false`，并清空三项 giscus 覆盖值
 
 模型页只有用户点击「加载讨论」后才连接 giscus，中英文和不同发布版本共用同一模型目录 ID 的讨论。示例条目不会连接真实讨论。访问 GitHub 投稿或加载 giscus 时遵循对应服务的身份与隐私规则
 

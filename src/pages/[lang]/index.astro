@@ -9,39 +9,55 @@ const lang=Astro.params.lang as Lang;
 <Layout lang={lang} active="home">
   <section class="hero container">
     <div class="hero-copy"><div class="eyebrow"><span class="small-star">✦</span> AN OPEN FIELD FOR DUELING AI</div><h1>{t(lang,'下一种对局可能，','A new way to duel,')}<br/><span>{t(lang,'从这里开始','starts here.')}</span></h1><p class="hero-description">{t(lang,'探索开放的游戏王 AI 模型，分享训练成果，','Discover open Yu-Gi-Oh! AI models. Share what you train.')}<br class="desktop-break"/>{t(lang,'与每一种不同的思考方式交手','Meet a different way of thinking across the table.')}</p><div class="hero-actions"><a class="button button-primary" href={path(lang,'models')}>{t(lang,'探索模型广场','Explore models')}<Icon name="arrow" size={18}/></a><a class="button button-outline" href={path(lang,'docs/getting-started')}><Icon name="book" size={18}/>{t(lang,'第一次来？从这里开始','Start your first duel')}</a></div><div class="hero-footnote"><span><i></i>{t(lang,'开放分享','Open to share')}</span><span>{t(lang,'作者托管','Author-hosted')}</span><span>{t(lang,'免费下载浏览','Free to explore')}</span></div></div>
-    <div class="hero-art" aria-label={t(lang,'Galatea 原创模型主题卡面：名称、星级、属性、插画和效果说明组成的装饰卡牌','An original Galatea model-themed card with a name, level stars, attribute, illustration, and effect text')} role="img">
+    <div class="hero-art" aria-label={t(lang,'游戏王卡牌：左侧为卡背，中间为 DM 系列，右侧为自奏系列','Yu-Gi-Oh! cards: a card back on the left, a DM card in the center, and an Orcust card on the right')} role="img">
       <div class="orbital orbital-one"></div><div class="orbital orbital-two"></div>
       <div class="orbit-dot dot-one"></div><div class="orbit-dot dot-two"></div>
       <div class="floating-note note-top"><span class="status-dot"></span> INTELLIGENCE IN PLAY</div>
-      <div class="hero-card card-back"><div class="card-back-orbit"></div><span>G</span></div>
-      <div class="hero-card card-middle"><div class="middle-name">OPEN STRATEGY</div><div class="middle-art"><span>✦</span></div><div class="middle-effect"></div></div>
-      <div class="hero-card card-front">
-        <div class="art-card-heading"><span>GALATEA</span><span class="card-attribute">{t(lang,'智','AI')}</span></div>
-        <div class="card-level" aria-hidden="true">{Array.from({length:4},()=> <span>★</span>)}</div>
-        <div class="card-illustration">
-          <svg viewBox="0 0 180 160" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true">
-            <defs><radialGradient id="galatea-card-glow"><stop stop-color="#e5dcff"/><stop offset="1" stop-color="#6d568e"/></radialGradient><linearGradient id="galatea-card-crystal" x1="60" y1="20" x2="120" y2="145" gradientUnits="userSpaceOnUse"><stop stop-color="#f5efff"/><stop offset=".5" stop-color="#c2abe1"/><stop offset="1" stop-color="#7c619e"/></linearGradient></defs>
-            <path fill="url(#galatea-card-glow)" d="M0 0h180v160H0z"/>
-            <circle cx="90" cy="80" r="58" stroke="#e9ddfb" opacity=".5"/>
-            <circle cx="90" cy="80" r="43" stroke="#f8f1ff" opacity=".45" stroke-dasharray="2 6"/>
-            <ellipse cx="90" cy="80" rx="77" ry="23" transform="rotate(-30 90 80)" stroke="#e6d1f8" opacity=".7"/>
-            <path d="m90 16 43 64-43 64-43-64 43-64Z" fill="url(#galatea-card-crystal)" stroke="#fff6ff" stroke-width="1.2"/>
-            <path d="m90 16-14 64 14 64 14-64-14-64Zm-43 64h86" stroke="#eee1ff" stroke-width=".8"/>
-            <path d="m90 61 13 19-13 19-13-19 13-19Z" fill="#fff6ff"/>
-            <path d="M24 34v10m-5-5h10m119 78v12m-6-6h12M145 26v6m-3-3h6M29 121v6m-3-3h6" stroke="#f8ebff"/>
-            <circle cx="152" cy="61" r="2" fill="#ead8ff"/><circle cx="34" cy="102" r="2" fill="#ead8ff"/>
-          </svg>
-        </div>
-        <div class="card-edition">GALATEAYGO — ORIGINAL SERIES</div>
-        <div class="card-effect"><strong>{t(lang,'【学习体 / 效果】','[ LEARNING ENTITY / EFFECT ]')}</strong><p>{t(lang,'观察局面，学习选择。每一次对局，让新的可能浮现。','Observe the field. Learn from each choice. Every duel opens a new possibility.')}</p><div class="card-stats"><span>MODEL / V4</span><span>OPEN / AI</span></div></div>
-        <div class="art-card-footer"><span>OBSERVE · LEARN · PLAY</span><i aria-hidden="true"></i></div>
+      <div class="hero-card card-back hero-card-photo">
+        <img src="/cards/back.webp" width="616" height="897" alt={t(lang,'游戏王卡背','Yu-Gi-Oh! card back')} decoding="async"/>
       </div>
+      <div class="hero-card card-middle hero-card-photo">
+        <img data-hero-card-pool={JSON.stringify(['39752820','48835607','90351981','92562411','93920420'].map(code=>`/cards/orcust/${code}.webp`))} width="616" height="896" alt={t(lang,'自奏系列卡牌','Orcust card')} decoding="async"/>
+        <noscript><img src="/cards/orcust/93920420.webp" width="616" height="896" alt={t(lang,'自奏系列卡牌','Orcust card')}/></noscript>
+      </div>
+      <div class="hero-card card-front hero-card-photo">
+        <img data-hero-card-pool={JSON.stringify(['22634473','38517737','46986417','47222536','55410871'].map(code=>`/cards/dm/${code}.webp`))} width="616" height="896" alt={t(lang,'DM 系列卡牌','DM card')} decoding="async"/>
+        <noscript><img src="/cards/dm/46986417.webp" width="616" height="896" alt={t(lang,'DM 系列卡牌','DM card')}/></noscript>
+      </div>
+      <script is:inline>
+        // 每次打开只选择一张系列卡图，避免先下载默认图再替换
+        document.querySelectorAll('img[data-hero-card-pool]').forEach(image => {
+          const cards = JSON.parse(image.dataset.heroCardPool);
+          image.src = cards[Math.floor(Math.random() * cards.length)];
+        });
+      </script>
       <div class="floating-note note-bottom"><Icon name="layers" size={16}/><span>{t(lang,'不同策略，共同进化','Different strategies. Shared progress.')}</span></div>
       <span class="art-coordinate">35°  /  POSSIBILITIES</span>
     </div>
   </section>
-  <div class="ecosystem-bar"><div class="container ecosystem-inner"><span class="ecosystem-label">{t(lang,'连接 Galatea 生态','PART OF THE GALATEA ECOSYSTEM')}</span><a href="https://github.com/Noctfom/Galatea-Core" target="_blank" rel="noopener noreferrer"><Icon name="code"/>Galatea Core <small>{t(lang,'训练与研究','Train & research')}</small><Icon name="external" size={13}/></a><a href={path(lang,'docs/getting-started')}><Icon name="layers"/>Galatea Link <small>{t(lang,'模型使用与接入','Play & connect')}</small><Icon name="arrow" size={14}/></a><span class="ecosystem-format">GKG 4 / 5 <span>·</span> MODEL PROTOCOL V4</span></div></div>
+  <div class="ecosystem-bar"><div class="container ecosystem-inner"><span class="ecosystem-label">{t(lang,'连接 Galatea 生态','PART OF THE GALATEA ECOSYSTEM')}</span><a href="https://github.com/Noctfom/Galatea-Core" target="_blank" rel="noopener noreferrer"><Icon name="code"/>Galatea Core <small>{t(lang,'训练与研究','Train & research')}</small><Icon name="external" size={13}/></a><a href="https://github.com/Noctfom/Galatea-Link" target="_blank" rel="noopener noreferrer"><Icon name="layers"/>Galatea Link <small>{t(lang,'模型使用与接入','Play & connect')}</small><Icon name="star" size={14}/></a><span class="ecosystem-format">GKG 4 / 5 <span>·</span> MODEL PROTOCOL V4</span></div></div>
   <section class="container section"><div class="section-heading"><div><div class="eyebrow">THE MODEL COLLECTION</div><h2>{t(lang,'找到你的下一位对手','Meet your next opponent')}</h2><p>{t(lang,'从通用对局到专项训练，探索不同模型的思路与可能','Explore new approaches, from general-purpose play to focused training.')}</p></div><a class="text-link" href={path(lang,'models')}>{t(lang,'浏览全部模型','View all models')}<Icon name="arrow" size={17}/></a></div><div class="model-grid">{models.slice(0,3).map(model=><ModelCard model={model} lang={lang}/>)}{!models.length && <div class="empty-state full-width"><Icon name="cube" size={32}/><h3>{t(lang,'第一个模型，等你分享','The first model could be yours')}</h3><p>{t(lang,'模型目录已经准备就绪，欢迎分享你的训练成果','The catalog is ready. Share your training work with the community.')}</p><a class="button button-primary" href={path(lang,'publish')}>{t(lang,'了解如何发布','How to publish')}<Icon name="arrow" size={16}/></a></div>}</div></section>
   <section class="container section journey-section"><div class="journey-intro"><div class="eyebrow">BUILT FOR EVERY CURIOUS MIND</div><h2>{t(lang,'你负责好奇，','Bring your curiosity.')}<br/>{t(lang,'这里连接可能','Find your next possibility.')}</h2><p>{t(lang,'无论你想找一个练习对手，还是训练自己的模型，都可以从这里开始','Find a practice partner or train a model of your own. There is a place to begin.')}</p><span class="journey-star">✳</span></div><a class="journey-card" href={path(lang,'docs/choose-model')}><span class="journey-number">01 / PLAY</span><Icon name="cube" size={30}/><h3>{t(lang,'和 AI 下一局','Play with an AI')}</h3><p>{t(lang,'了解模型、选择版本，将部署包导入客户端，开始你的下一场对局','Choose a model and release, import the package into your client, and start a duel.')}</p><span class="text-link">{t(lang,'查看使用指南','Read the player guide')}<Icon name="arrow" size={17}/></span></a><a class="journey-card" href={path(lang,'publish')}><span class="journey-number">02 / CREATE</span><Icon name="code" size={30}/><h3>{t(lang,'让成果被看见','Share what you build')}</h3><p>{t(lang,'用一张模型卡介绍你的训练成果，带上卡组、使用说明与评测记录','Give your model a home, with deck lists, instructions, and evaluation notes.')}</p><span class="text-link">{t(lang,'了解模型发布','Explore publishing')}<Icon name="arrow" size={17}/></span></a></section>
   <section class="container community-callout"><div class="callout-icon"><Icon name="message" size={27}/></div><div><h2>{t(lang,'好的对局，始于交流','Better duels begin with a conversation')}</h2><p>{t(lang,'分享一个想法、复盘一次选择，或一起探索 AI 的下一步','Share an idea, revisit a decision, or explore what comes next for dueling AI.')}</p></div><a class="button button-outline" href={path(lang,'community')}>{t(lang,'走进社区','Explore the community')}<Icon name="arrow" size={16}/></a></section>
 </Layout>
+
+<style>
+  .hero-card-photo {
+    height: auto;
+    aspect-ratio: 616 / 896;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  .hero-card-photo.card-back { aspect-ratio: 616 / 897; }
+  .hero-card-photo.card-back::after { content: none; }
+  .hero-card-photo.card-front { box-shadow: 10px 22px 40px #55406b29; }
+  .hero-card-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: inherit;
+    object-fit: contain;
+  }
+  .hero-card-photo img:not([src]) { display: none; }
+</style>
